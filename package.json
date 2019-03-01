@@ -1,0 +1,40 @@
+{
+  "name": "shop",
+  "version": "1.0.0",
+  "description": "A restful API for a shop application",
+  "engines": {
+    "node": "8.9.4"
+  },
+  "main": "server.js",
+  "scripts": {
+    "test": "snyk test",
+    "start": "nodemon server.js"
+  },
+  "author": "Stanley Gatimu",
+  "license": "ISC",
+  "dependencies": {
+    "@sendgrid/mail": "^6.2.1",
+    "algoliasearch": "^3.27.1",
+    "async": "^2.6.0",
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "ejs": "^2.6.1",
+    "express": "^4.16.2",
+    "express-brute": "^1.0.1",
+    "express-brute-mongoose": "^1.0.2",
+    "express-sanitizer": "^1.0.4",
+    "helmet": "^3.12.0",
+    "jsonwebtoken": "^8.1.1",
+    "mongoose": "^5.4.14",
+    "mongoose-algolia": "^1.7.1",
+    "morgan": "^1.9.1",
+    "multer": "^1.3.0",
+    "nodemailer": "^4.6.4",
+    "passport": "^0.4.0",
+    "passport-google-plus-token": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10",
+    "snyk": "^1.134.2"
+  }
+}
