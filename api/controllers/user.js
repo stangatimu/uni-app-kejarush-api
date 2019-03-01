@@ -1,4 +1,4 @@
-const User = require("../models/users.js"),
+const User = require("../models/user"),
     Product = require("../models/property"),
     mongoose = require("mongoose"),
     bcrypt = require("bcrypt"),
