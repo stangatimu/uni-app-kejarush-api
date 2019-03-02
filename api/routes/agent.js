@@ -12,5 +12,6 @@ router.post("/login",rateLimit.userBF.prevent,AgentContollers.agent_login);
 
 router.put("/edit",rateLimit.userBF.prevent,checkRole,AgentContollers.agent_edit);
 
+router.put("/manage",rateLimit.userBF.prevent,checkRole,AgentContollers.admin_agent_manage);
 
 module.exports = router;

@@ -109,7 +109,7 @@ exports.agent_edit = async (req,res)=>{
     } 
 }
 
-exports.agent_admin_edit = async (req,res)=>{
+exports.admin_agent_manage = async (req,res)=>{
     if(req.userData.role !== 'admin'){
         return res.status(401).json({
             success: false,
