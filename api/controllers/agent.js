@@ -117,7 +117,7 @@ exports.admin_agent_manage = async (req,res)=>{
         });         
     }
     try{
-        const agent = await Agent.findOne({_id: req.userData.agentID});
+        const agent = await Agent.findOne({_id: req.query.agent});
         if(!agent){
             return res.status(404).json({
                 success: false,
