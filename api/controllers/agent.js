@@ -1,21 +1,25 @@
-const   bcrypt = require('bcrypt'),
+const   mongoose = require('mongoose'),
+        bcrypt = require('bcrypt'),
         Agent = require('../models/agent'),
         comparePassword = require('../utils/comp_password');
 
 
 
 exports.agent_signup = async (req,res)=>{
+    console.log(req.body);
     try{
         agent = await Agent.find({name: req.body.name});
     }catch(err){
         return res.status(500).json({
             success: false,
             message:'error while creating a new agent'
+            // message: err.message
         });
     }
-    if(!agent){
+    if(!agent.length){
+        console.log(req.body);
         try{
-            hash = bcrypt.hasg(req.body.password,16);
+            hash = await bcrypt.hash(req.body.password,10);
             const newAgent = new Agent({
                 _id: new mongoose.Types.ObjectId(),
                 name: req.body.name,
@@ -26,20 +30,24 @@ exports.agent_signup = async (req,res)=>{
             return res.status(201).json({
                 success: false,
                 user:{
-                    name: user.name,
-                    role: user.role,
-                    status:  user.status,
-                    _id: user._id
+                    status: newAgent.status,
+                    role: newAgent.role,
+                    name:newAgent.name,
+                    _id: newAgent._id
                 }
-            })
-
+            });
         }catch(err){
             return res.status(500).json({
                 success: false,
                 message:'error while creating a new agent'
+                // message: err.message
             });
         }
-    }    
+    } 
+    return res.status(401).json({
+        success: false,
+        message: "An agent with that username already exits."
+    });   
 }
 
 exports.agent_login = (req,res)=>{

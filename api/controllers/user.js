@@ -153,7 +153,7 @@ exports.users_login = (req, res, next) => {
                 success: false,
                 error: e.message
             });
-    });
+        });
 }
 //display profile
 exports.users_profile = async function (req, res, next) {

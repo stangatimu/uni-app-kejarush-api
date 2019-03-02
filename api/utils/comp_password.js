@@ -18,7 +18,7 @@ comparePassword = (password1,user,resp)=>{
 				});
 			}
 			const token = jwt.sign({
-				email:user.email,
+				phone:user.phone,
 				userId: user._id
 			  }, process.env.jwtkey,
 			  { expiresIn: "7d"}
@@ -27,7 +27,7 @@ comparePassword = (password1,user,resp)=>{
 				success: true,
 				message:"Authentication successful",
 				user:{
-					email: user.email,
+					phobe: user.phone,
 					name: user.name
 				},
 				token: token,
