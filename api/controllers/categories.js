@@ -1,9 +1,9 @@
-const Category = require("../models/category.js");
+const Category = require("../models/categories.js");
 
 //main cartegory controllers
 exports.category_get_all = function (req, res, next) {
 	 Category.find()
-	.select('name image products')
+	.select('name image products subcategories')
  	.exec()
  	.then(category =>{
  		if (category) {
@@ -24,7 +24,8 @@ exports.category_get_all = function (req, res, next) {
 exports.category_create = function (req, res, next) {
 	const category = new Category({
 		name: req.body.name,
-		image: req.file.path,
+		image: req.body.image,
+		subcategories: req.body.subcategories.split(",")
 	});
 	Category.create(category,(err, newCategory)=>{
 		if (err) {
@@ -52,7 +53,9 @@ exports.category_edit = function (req, res, next) {
 				success:false,
 				error:'no entry found'}); 
 		}
-		category.image = req.body.image
+		req.body.image ? category.image = req.body.image : category.image;
+		req.body.name ? category.name = req.body.name : category.name;
+		req.body.subcategories ? category.subcategories = req.body.subcategories.split(',') : category.subcategories;
 		category.save()
 		res.status(200).json({
 			success: true,

@@ -5,7 +5,8 @@ const express = require('express'),
         mongoose = require('mongoose'),
         helmet = require('helmet');
 
-const user_routes = require('./api/routes/user');
+const user_routes = require('./api/routes/user'),
+		category_routes = require('./api/routes/categories');
 
 app.set('trust proxy',+1);
 
@@ -34,6 +35,7 @@ app.use((req, res, next)=>{
 });
 
 app.use('/user',user_routes);
+app.use('/categories',category_routes)
 
 app.get('/',(req,res,next)=>{
 	res.send('kejarush up and running');
