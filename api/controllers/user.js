@@ -72,19 +72,31 @@ exports.phone_confirmation = function (req, res, next) {
     // Find a matching token
     Token.findOne({ token: req.params.token }, function (err, token) {
         if (!token) return res.render("resendConfirm", {
-            message: "We were having trouble activating your account. Your link my have expired. Enter your email below to recieve another link"
+            message: "We were having trouble activating your account. Your link my have expired."
         });
 
         // If we found a token, find a matching user
         User.findOne({ _id: token._userId }, function (err, user) {
-            if (!user) return res.render("passwordCofirm", { message: "We were having trouble activating your account." });
-            if (user.isVerified) return res.render("passwordCofirm", { message: "Your account is already ativated. Please log in." });
+            if (!user) return res.status(500).json({ 
+                success: false,        
+                message: "We were having trouble activating your account." 
+            });
+            if (user.isVerified) return res.status(200).json({ 
+                success: false,
+                message: "Your account is already ativated. Please log in." 
+            });
 
             // Verify and save the user
             user.isVerified = true;
             user.save(function (err) {
-                if (err) { return res.render("resendConfirm", { message: "We were having trouble activating your account. Your link my have expired.Enter your email below to recieve another link" }); }
-                return res.render("passwordCofirm", { message: "Account has been verified you can now log in in the app" });
+                if (err) { return res.status(500).json({ 
+                    success: false,
+                    message: "We were having trouble activating your account." });
+                }
+                return res.status(201).json({ 
+                    success: false,
+                    message: "Account has been verified you can now log in in the app" 
+                });
             });
         });
     });
@@ -93,15 +105,25 @@ exports.phone_confirmation = function (req, res, next) {
 exports.resend_confirmation = function (req, res, next) {
     const ejs = true;
     User.findOne({ email: req.body.email }, function (err, user) {
-        if (!user) return res.render("passwordCofirm", { message: 'Check ' + req.body.email + ' for verification link.' });
-        if (user.isVerified) return res.render("passwordCofirm", { message: "Account is already activated.Please log in." });
+        if (!user) return res.status(200).json({ 
+            success: true,
+            message: 'Check ' + req.body.email + ' for verification link.' 
+        });
+        if (user.isVerified) return res.status(201).json({ 
+            success: true, 
+            message: "Account is already activated.Please log in." 
+        });
 
         // Create a verification token, save it, and send email
         var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
 
         // Save the token
         token.save(function (err) {
-            if (err) { if (user.isVerified) return res.render("passwordCofirm", { message: "we are having trouble sending you a link. Please try again latter" }); }
+            if (err) { if (user.isVerified) return res.status(500).json({
+                success: false, 
+                message: "we are having trouble sending you a link. Please try again latter" 
+            }); 
+        }
 
             // Send email custom fuction
             sendMail(req, res, user, token, ejs)
@@ -131,7 +153,7 @@ exports.users_login = (req, res, next) => {
                 success: false,
                 error: e.message
             });
-        });
+    });
 }
 //display profile
 exports.users_profile = async function (req, res, next) {
