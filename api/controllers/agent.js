@@ -6,7 +6,12 @@ const   mongoose = require('mongoose'),
 
 
 exports.agent_signup = async (req,res)=>{
-    console.log(req.body);
+    if(req.userData.role !== 'admin'){
+        return res.status(401).json({
+            success: false,
+            message: "You are not allowed to perform this action."
+        });         
+    }
     try{
         agent = await Agent.find({name: req.body.name});
     }catch(err){
@@ -75,11 +80,11 @@ exports.agent_login = (req,res)=>{
 
 exports.agent_edit = async (req,res)=>{
     try{
-        agent = await Agent.find({_id: req.body.agent});
+        agent = await Agent.find({_id: req.userData._id});
     }catch(err){
         return res.status(500).json({
             success: false,
-            message:'error while creating a new agent'
+            message:'error while editing agent'
         });
     }
     if(!agent){
