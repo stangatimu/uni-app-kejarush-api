@@ -1,7 +1,7 @@
 const   mongoose = require('mongoose'),
         bcrypt = require('bcrypt'),
         Agent = require('../models/agent'),
-        comparePassword = require('../utils/comp_password');
+        comparePassword = require('../utils/agent/cmp_password');
 
 
 
