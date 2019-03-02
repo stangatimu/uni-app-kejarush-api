@@ -146,3 +146,26 @@ exports.admin_agent_manage = async (req,res)=>{
         });
     }
 }
+
+exports.admin_get_agents = async (req,res)=>{
+    if(req.userData.role !== 'admin'){
+        return res.status(401).json({
+            success: false,
+            message: "You are not allowed to perform this action."
+        });         
+    }
+
+    try{
+        const agents = await Agent.find().select('name _id status role');
+        return res.status(200).json({
+            success: false,
+            agents: agents
+        });
+    }catch(err){
+        return res.status(500).json({
+            success: false,
+            message:err.message
+        });        
+    }
+
+}
