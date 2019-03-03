@@ -113,3 +113,29 @@ exports.property_delete = async (req, res)=>{
         });
     }
 }
+
+exports.property_get_all = async (req, res)=>{
+
+    try{
+        const page = ParseInt(req.params.page) || 0;
+
+        const properties = await Property.find().limit(page);
+
+        if(!properties.length){
+            return res.status(404).json({
+                success: false,
+                message: "Sorry, properties available yet."
+            });
+        }
+        return res.status(200).json({
+            success: success,
+            properties: properties
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+}
