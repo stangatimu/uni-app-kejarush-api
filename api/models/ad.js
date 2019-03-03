@@ -4,14 +4,17 @@ const adSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
     name:{type: String,required:[true,'Ad name is required']},
     property:{type: mongoose.Schema.Types.ObjectId, ref:'Property', required: true},
+    author:{type: mongoose.Schema.type.ObjectId, ref:'Agent', 
+            required:[true,'field cannot be empty']},
     rent:{type: Number,required:[true,'rent field cannot be empty']},
     category:{
-        type: String, 
-        enum:['flats & apartments','houses','commercial property','land'],
-        require:[true,'ad category cannot be empty']
+       name: {type: String, require:[true,'field cannot be empty']},
+       _id:{type: String, require:[true,'field cannot be empty']}
     },
+    subcategory:{type:String,required:[true,'field cannot be empty']},
     upFor:{type: String,enum:['sale','rent'], required:[true,'for field cannot be empty']},
     photos:{type:[String],default:['']},
+    description:{type: String, require:[true,'field cannot be empty']},
     bookings:{type:[mongoose.Schema.Types.ObjectId],ref:'Booking',default:['']},
     location: {
 		type: { type: String },
