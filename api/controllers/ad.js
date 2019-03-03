@@ -38,7 +38,7 @@ exports.ad_create = async function (req, res, next) {
     } catch (err) {
         return res.status(400).json({
             success: true,
-            message: `Sorry, product could not be posted`
+            message: err.message
         });
     }
 }
