@@ -183,7 +183,7 @@ exports.users_profile = async function (req, res, next) {
 }
 //edit profile
 exports.users_edit = function (req, res, next) {
-    User.findOne({ _id: req.userData.userId }, (err, user) => {
+    User.findById(req.userData.userId, (err, user) => {
         if (err) return next(err);
         if (req.body.name) user.name = req.body.name;
         if (req.body.email) user.email = req.body.email;

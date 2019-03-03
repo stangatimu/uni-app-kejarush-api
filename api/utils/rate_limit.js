@@ -3,7 +3,7 @@ const ExpressBrute = require('express-brute'),
       StoreModel = require('../models/expressBrute.js'),
       Store = new mongooseStore(StoreModel);
 var failCB = function (req, res, next, nextValidRequestDate) {
-    res.status(401).json({
+    res.status(429).json({
         succcess: false,
         message: "sorry! too many requests"
 
