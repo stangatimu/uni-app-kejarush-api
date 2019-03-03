@@ -12,17 +12,14 @@ module.exports = async (req, res,next)=>{
             res.status(401).json({
                 success: false,
                 message:"You are not authorized to perform this actions."
-            });
-            
+            });    
         }
         
-
 	} catch (err) {
 		res.status(401).json({
             success: false,
-            // message: 'Authentication failed, please login to continue.'
-            message: err
+            message: 'Authentication failed, please login to continue.'
+            // message: err.message
 		});
 	}
-	
 }

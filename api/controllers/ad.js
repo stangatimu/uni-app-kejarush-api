@@ -4,20 +4,21 @@ const Property = require('../models/property'),
     Category = require('../models/categories');
 
 
-exports.ad_create = async function (req, res, next) {
+exports.ad_create = async function (req, res) {
     const geoLoc = {
         type: "Point",
         coordinates: [req.body.lon, req.body.lat]
     }
     try {
         const category = await Category.findById(req.body.category);
+        const property = await Property.findById(req.body.property);
         const ad = new Ad({
             _id: new mongoose.Types.ObjectId,
             name: req.body.name,
-            property: req.body.Property,
-            author: req.userData.userId,
+            property: property._id,
+            author: req.userData.agentID,
             rent: req.body.rent,
-            description: req.body.description,
+            description: req.body.desc,
             category: {
                 name: category.name,
                 _id: category._id
@@ -27,7 +28,7 @@ exports.ad_create = async function (req, res, next) {
             upFor: req.body.type,
             photos: req.body.photos.split(',')
         });
-        const newAd = await Product.create(ad);
+        const newAd = await Ad.create(ad);
         category.property++;
         category.save();
         return res.status(201).json({
@@ -41,4 +42,62 @@ exports.ad_create = async function (req, res, next) {
             message: err.message
         });
     }
+}
+
+exports.property_delete = async function (req, res, next) {
+	try{
+		const ad = await Ad.findById(req.params.id);
+		const category = await Category.findById(ad.category);
+        
+        
+		category.property--;
+		subcategory.save();
+		category.save();
+		Ad.deleteOne({ _id: ad._id });
+
+		return	res.status(200).json({
+				success: true,
+				message: "Product has been deleted",
+			});
+	
+		
+	}catch(err){
+		res.status(500).json({
+			success: false,
+			message: err
+		});
+	}	
+}
+
+
+exports.ad_get_all = function (req, res) {
+	var perPage = parseInt(req.query.per) || 10;
+	var page = req.query.page;
+	var high = 100000000;
+	var low = 0;
+	if(req.query.high) high = req.query.high;
+	if(req.query.low) low = req.query.low;
+
+	 Ad.find({rent: {$lte: high, $gte: low}})
+	 .sort({created: -1, rating: -1})
+	 .skip(perPage * page)
+	 .limit(perPage)
+ 	.exec()
+ 	.then(ads =>{
+ 		if (ads.length>0) {
+ 			res.status(200).json({
+				 success: true,
+                 entries: ads
+                });
+ 		} else {
+ 			res.status(404).json({
+				success: false, 
+				message:'No entries found'});
+ 		}
+ 	})
+ 	.catch(err=>{
+ 		res.status(500).json({
+			success: false, 
+			message:"sorry! found errors on request"});
+ 	});
 }

@@ -7,3 +7,6 @@ const express = require('express'),
 
 
 router.post('/', rateLimit.globalBF.prevent,checkRole,Controllers.ad_create);
+
+
+module.exports = router;
