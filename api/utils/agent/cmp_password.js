@@ -18,7 +18,7 @@ comparePassword = (password1,agent,resp)=>{
 				});
 			}
 			const token = jwt.sign({
-				name:agent.username,
+				name:agent.name,
                 agentID: agent._id,
                 role: agent.role                
 			  }, process.env.jwtkey,

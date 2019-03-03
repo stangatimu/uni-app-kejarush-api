@@ -9,7 +9,8 @@ const propertySchema = new mongoose.Schema({
     location: {
 		  type: { type: String },
 		  coordinates: {type: [Number], default:[0,0]},
-	  }
+    },
+    author:{type: String,required:[true,'Author field was not provided.']}
 },{
 	toObject: {virtuals: true},
 	toJSON: {virtuals: true}

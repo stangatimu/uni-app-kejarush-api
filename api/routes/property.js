@@ -10,4 +10,6 @@ router.patch('/',rateLimit.globalBF.prevent,checkRole,Controller.property_edit);
 
 router.delete('/',rateLimit.globalBF.prevent,checkRole,Controller.property_delete);
 
+router.get('/',rateLimit.globalBF.prevent,checkRole,Controller.property_get_all);
+
 module.exports = router;

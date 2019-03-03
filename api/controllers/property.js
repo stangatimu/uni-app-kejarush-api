@@ -11,7 +11,7 @@ exports.property_create = async (req,res)=>{
     }
     try{
         const property = new Property({
-            _id: mongoose.Schema.Types.ObjectId,
+            _id: new  mongoose.Types.ObjectId(),
             name: req.body.name,
             photos: req.body.photos.split(","),
             location: geoLoc,
@@ -47,7 +47,7 @@ exports.property_create = async (req,res)=>{
 exports.property_edit = async (req, res)=>{
 
     try{
-        const property = await Property.findById(req.params.id);
+        const property = await Property.findById(req.query.property);
         if(!property){
             return res.status(404).json({
                 success: true,
@@ -67,7 +67,7 @@ exports.property_edit = async (req, res)=>{
         }
         property.save();
 
-        return res.status(202),json({
+        return res.status(202).json({
             success: true,
             message:"Property has been updated successfuly.",
             property:{
@@ -83,14 +83,14 @@ exports.property_edit = async (req, res)=>{
     }catch(error){
         return res.status(500).json({
 			success: true,
-			message: err.message
+			message: error.message
 		});
     }
 }
 
 exports.property_delete = async (req, res)=>{
     try{
-        const user = await User.findOne({property: req.params.property});
+        const user = await User.findOne({property: req.query.property});
 
         if(user){
             return res.status(409).json({
@@ -99,17 +99,21 @@ exports.property_delete = async (req, res)=>{
             });
         }else{
 
-            const result = Property.remove({_id: req.params.property});
-            return res.status(201).json({
-                success: true,
-                message: "property was successfuly deleted."
+            Property.deleteOne({_id: req.query.property})
+            .then(()=>{
+                return res.status(201).json({
+                    success: true,
+                    message: "property was successfuly deleted.",
+                    _id: "query, " + req.query.property
+                });
             });
         }
     }catch(error){
 
         return res.status(500).json({
-            success: true,
-            message: "Sorry, property was not deleted, please try again."
+            success: false,
+            // message: "Sorry, property was not deleted, please try again."
+            message: error.message
         });
     }
 }
@@ -117,18 +121,18 @@ exports.property_delete = async (req, res)=>{
 exports.property_get_all = async (req, res)=>{
 
     try{
-        const page = ParseInt(req.params.page) || 0;
+        const page = parseInt(req.params.page) || 0;
 
         const properties = await Property.find().limit(page);
 
         if(!properties.length){
             return res.status(404).json({
                 success: false,
-                message: "Sorry, properties available yet."
+                message: "Sorry, no properties available yet."
             });
         }
         return res.status(200).json({
-            success: success,
+            success: true,
             properties: properties
         });
 
