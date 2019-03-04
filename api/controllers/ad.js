@@ -44,27 +44,27 @@ exports.ad_create = async function (req, res) {
     }
 }
 
-exports.property_delete = async function (req, res, next) {
+exports.ad_delete = async function (req, res) {
 	try{
-		const ad = await Ad.findById(req.params.id);
+		const ad = await Ad.findById(req.query.ad);
 		const category = await Category.findById(ad.category);
         
         
 		category.property--;
-		subcategory.save();
 		category.save();
-		Ad.deleteOne({ _id: ad._id });
+		const result = await Ad.deleteOne({ _id: ad._id });
 
 		return	res.status(200).json({
 				success: true,
-				message: "Product has been deleted",
-			});
+                message: "Property has been deleted",
+                result: result
+		});
 	
 		
 	}catch(err){
 		res.status(500).json({
 			success: false,
-			message: err
+			message: "Property has not been deleted. Try again later."
 		});
 	}	
 }
@@ -100,4 +100,36 @@ exports.ad_get_all = function (req, res) {
 			success: false, 
 			message:"sorry! found errors on request"});
  	});
+}
+
+exports.get_by_category = function (req,res){
+    const perPage = parseInt(req.query.per) || 10;
+	var page = req.query.page;
+	var high = 100000000;
+	var low = 0;
+	if(req.query.high) high = req.query.high;
+	if(req.query.low) low = req.query.low;
+
+	Ad.find({category: {_id:req.params.id},rent: {$lte: high, $gte: low}})
+	.sort({created: -1})
+	.skip(perPage * page)
+	.limit(perPage)
+	.exec()
+	.then(ad =>{
+		if (products) {
+			res.status(200).json({
+				success: true,
+				entries: ad});
+		} else {
+			res.status(404).json({
+				success: false,
+				message:'No entries yet'});
+		}
+	})
+	.catch(err=>{
+		res.status(500).json({
+			success: false,
+            message:err.message
+        });
+	});
 }
