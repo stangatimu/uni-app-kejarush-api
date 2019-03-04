@@ -12,5 +12,7 @@ router.delete('/', rateLimit.globalBF.prevent,checkRole,Controllers.ad_delete);
 
 router.get('/', rateLimit.globalBF.prevent,checkRole,Controllers.ad_get_all);
 
+router.get('/category/:id', rateLimit.globalBF.prevent,checkRole,Controllers.get_by_category);
+
 
 module.exports = router;
