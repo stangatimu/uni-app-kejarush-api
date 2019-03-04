@@ -16,7 +16,7 @@ router.get('/category/:id', rateLimit.globalBF.prevent,Controllers.get_by_catego
 
 router.get('/subcategory/:name', rateLimit.globalBF.prevent,Controllers.get_by_subcategory);
 
-
+router.get('/location', rateLimit.globalBF.prevent,Controllers.get_by_location);
 
 
 

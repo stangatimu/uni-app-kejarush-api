@@ -166,3 +166,47 @@ exports.get_by_subcategory = function (req, res){
 	});
     
 }
+
+exports.get_by_location = (req, res)=>{
+    
+    const perPage = parseInt(req.query.per) || 10;
+	var page = req.query.page;
+	var high = 100000000;
+	var low = 0;
+	if(req.query.high) high = req.query.high;
+	if(req.query.low) low = req.query.low;
+	Ad.find({
+		location: {
+		 $near: {
+		  $maxDistance: req.query.range ,
+		  $geometry: {
+		   type: "Point",
+		   coordinates: [req.query.lon, req.query.lat]
+		  }
+		 }
+		}
+		,offerPrice: {$lte: high, $gte: low}
+	   })
+	   .sort({created: -1})
+	.skip(perPage * page)
+	.limit(perPage)
+	.exec()
+	.then(ads =>{
+		if (ads.length) {
+			res.status(200).json({
+				success: true,
+				entries: ads});
+		} else {
+			res.status(404).json({
+				success: false,
+                message:'No entries yet'
+            });
+		}
+	})
+	.catch(err=>{
+		res.status(500).json({
+			success: false,
+			message:err});
+    });
+    
+}

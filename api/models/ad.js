@@ -19,7 +19,7 @@ const adSchema = new mongoose.Schema({
     location: {
 		type: { type: String },
 		coordinates: {type: [Number], default:[0,0]},
-	}
+        }
 },{
 	toObject: {virtuals: true},
 	toJSON: {virtuals: true}
