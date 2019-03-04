@@ -110,13 +110,13 @@ exports.get_by_category = function (req,res){
 	if(req.query.high) high = req.query.high;
 	if(req.query.low) low = req.query.low;
 
-	Ad.find({category: {_id:req.params.id},rent: {$lte: high, $gte: low}})
+	Ad.find({"category._id":req.params.id,rent: {$lte: high, $gte: low}})
 	.sort({created: -1})
 	.skip(perPage * page)
 	.limit(perPage)
 	.exec()
 	.then(ad =>{
-		if (products) {
+		if (ad.length) {
 			res.status(200).json({
 				success: true,
 				entries: ad});
@@ -132,4 +132,37 @@ exports.get_by_category = function (req,res){
             message:err.message
         });
 	});
+}
+
+exports.get_by_subcategory = function (req, res){
+    const perPage = parseInt(req.query.per) || 10;
+	var page = req.query.page;
+	var high = 100000000;
+	var low = 0;
+	if(req.query.high) high = req.query.high;
+	if(req.query.low) low = req.query.low;
+
+	Ad.find({subcategory:req.params.name,rent: {$lte: high, $gte: low}})
+	.sort({created: -1})
+	.skip(perPage * page)
+	.limit(perPage)
+	.exec()
+	.then(ad =>{
+		if (ad.length) {
+			res.status(200).json({
+				success: true,
+				entries: ad});
+		} else {
+			res.status(404).json({
+				success: false,
+				message:'No entries yet'});
+		}
+	})
+	.catch(err=>{
+		res.status(500).json({
+			success: false,
+            message:err.message
+        });
+	});
+    
 }
