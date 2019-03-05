@@ -228,9 +228,6 @@ exports.users_delete = function (req, res, next) {
         });
 }
 
-
-
-
 exports.deleteProperty = async function (req, res, next) {
     try {
         property = await Property.findById(prodId);

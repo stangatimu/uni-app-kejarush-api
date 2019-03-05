@@ -69,7 +69,6 @@ exports.ad_delete = async function (req, res) {
 	}	
 }
 
-
 exports.ad_get_all = function (req, res) {
 	var perPage = parseInt(req.query.per) || 10;
 	var page = req.query.page;

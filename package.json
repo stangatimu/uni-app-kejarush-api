@@ -24,6 +24,7 @@
     "express-brute-mongoose": "^1.0.2",
     "express-sanitizer": "^1.0.4",
     "helmet": "^3.12.0",
+    "joi": "^14.3.1",
     "jsonwebtoken": "^8.1.1",
     "mongoose": "^5.4.14",
     "mongoose-algolia": "^1.7.1",
