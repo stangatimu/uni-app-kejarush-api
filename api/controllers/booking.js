@@ -1,27 +1,15 @@
-const https = require('https'),
+const http = require('http'),
     Booking = require("../models/booking"),
-    ad = require("../models/ad");
+    ad = require("../models/ad"),
+    getMpesaToken = require('../utils/getMpesaToken');
 
 
 exports.intialize_booking = async (req,res)=>{
 
     let auth = "Basic " + new Buffer(process.env.Mpesa_consumer_key + ":" + Mpesa_consumer_secret).toString("base64");
 
-    let options = {
-        hostname:"sandbox.safaricom.co.ke",
-        method:'GET',
-        path:'',
-        headers:{
-            "Content-Type":"application/json",
-            "Authorization": auth
-        }
-
-    }
-
-    let resp = await https.get(options);
-
     // get token
-    token = resp.access_token;
+    let token = await getMpesaToken(auth)
 
     // encode password to base64 (business short code, passkey and timestamp)
 
