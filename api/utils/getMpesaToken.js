@@ -1,30 +1,27 @@
-const http = require('http');
+const axios = require('axios');
 
+let getMpesaAuthToken = ()=>{
+    let auth = "Basic " + new Buffer(process.env.Mpesa_consumer_key + ":" + process.env.Mpesa_consumer_secret).toString("base64");
 
-let getMpesaAuthToken = (auth)=>{
-    return http.get({
-        hostname:"sandbox.safaricom.co.ke",
-        method:'GET',
-        path:'',
+    const request = axios.create({
+        baseURL:'https://sandbox.safaricom.co.ke',
         headers:{
             "Content-Type":"application/json",
             "Authorization": auth
         }
-    },(response)=>{
-        let body = '';
         
-        response.on('data',(data)=>{
-            body += data;
-        });
-        response.on('error',(error)=>{
-            throw error.message;
-        })
-        response.on('end', ()=>{
-            var jsonBody = JSON.parse(body);
-            return {access_token} = jsonBody;
-            
-        })
+    });
+
+    request.get('/oauth/v1/generate?grant_type=client_credentials')
+    .then(res=>{
+        console.log(res);
     })
+    .catch(err=>{
+        console.log(err)
+    })
+
+    
 }
 
 module.exports = getMpesaAuthToken;
+// getMpesaAuthToken();
