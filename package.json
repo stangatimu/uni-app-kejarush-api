@@ -1,7 +1,7 @@
 {
   "name": "shop",
   "version": "1.0.0",
-  "description": "A restful API for a shop application",
+  "description": "",
   "engines": {
     "node": "8.9.4"
   },

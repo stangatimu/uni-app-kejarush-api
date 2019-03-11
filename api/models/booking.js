@@ -12,7 +12,7 @@ const bookingSchema = new mongoose.Schema({
     checkoutRequestID:{type:String,require:[true,'field cannot be empty']},
     status:{type:String,required: true},
     amount:{type:Number,default:0},
-    time:{type: date, default: Date.now}
+    time:{type: Date, default: Date.now}
 });
 
 module.exports = mongoose.model('Booking',bookingSchema);
