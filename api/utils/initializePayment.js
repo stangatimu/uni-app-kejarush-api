@@ -1,4 +1,4 @@
-const axios = require('axios'),
+const Axios = require('axios'),
     getMpesaToken = require('./getMpesaToken'),
     getTimeStamp = require('./getTimeStamp');
 
@@ -14,10 +14,14 @@ const initializeStkPush = async function (phone, amount, userID) {
     let token = await getMpesaToken();
 
     // create headers with access token
-    let headers = {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-    }
+    const axios = Axios.create({
+        baseURL: "https://sandbox.safaricom.co.ke",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        }
+
+    });
 
     // create a body
     let body = {
@@ -34,11 +38,8 @@ const initializeStkPush = async function (phone, amount, userID) {
         AccountReference: userID,
         TransactionDesc: "House booking payment"
     }
-    
-    const data = await axios.post(
-        "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
-        headers,
-        body);
+
+    const data = await axios.post("/mpesa/stkpush/v1/processrequest",body);
 
     return data;
 
