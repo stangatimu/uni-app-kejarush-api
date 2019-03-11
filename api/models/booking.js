@@ -6,11 +6,10 @@ const bookingSchema = new mongoose.Schema({
     property:{type: String,required: [true,'property required']},
     client:{
         name:{type: String,required:[true,'tenant name required']},
-        idnumber:{type: String, required:[true,'id number required']},
         phone:{type:Number,required:[true,'field cannot be empty']}
     },
     checkoutRequestID:{type:String,require:[true,'field cannot be empty']},
-    status:{type:String,required: true},
+    status:{type:String,default:'pending'},
     amount:{type:Number,default:0},
     time:{type: Date, default: Date.now}
 });

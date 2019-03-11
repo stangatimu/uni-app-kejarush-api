@@ -7,9 +7,8 @@ const initializeStkPush = async function (phone, amount, userID) {
 
 
     // encode password to base64 (business short code, passkey and timestamp)
-    let password = new Buffer(`"174379"
-                        ${process.env.onlinePassKey}
-                        ${getTimeStamp()}`).toString('base64');
+    let password = new Buffer(`601443bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c91920190216100234`)
+    .toString('base64');
 
     //get auth token
     let token = await getMpesaToken();
@@ -23,18 +22,19 @@ const initializeStkPush = async function (phone, amount, userID) {
     // create a body
     let body = {
         headers: headers,
-        BusinessShortCode: "174379",
+        BusinessShortCode: '601443',
         Password: password,
         Timestamp: getTimeStamp(),
         TransactionType: "CustomerPayBillOnline",
         Amount: amount,
         PartyA: phone,
-        PartyB: "174379",
+        PartyB: "601443",
         PhoneNumber: phone,
         CallBackURL: "http://mpesa-requestbin.herokuapp.com/xnmn75xn",
         AccountReference: userID,
         TransactionDesc: "House booking payment"
     }
+    
     const data = await axios.post(
         "https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest",
         headers,

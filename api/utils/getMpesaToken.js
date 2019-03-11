@@ -1,7 +1,7 @@
 const Axios = require('axios');
 
 let getMpesaAuthToken = async ()=>{
-    // try{
+    console.log(process.env.Mpesa_consumer_key)
     let auth = "Basic " + new Buffer(process.env.Mpesa_consumer_key + ":" + process.env.Mpesa_consumer_secret).toString("base64");
 
     const axios = Axios.create();
@@ -11,9 +11,6 @@ let getMpesaAuthToken = async ()=>{
 
     return res.data.access_token;
    
-    // }catch(e){
-    //     return new Error('Something went wrong please try again latter.');
-    // }
     
 }
 
