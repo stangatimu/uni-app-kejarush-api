@@ -49,7 +49,7 @@ app.get('/',(req,res,next)=>{
 	res.send('kejarush up and running');
 });
 
-app.use((error,req,res,next)=>{
+app.use("*",(error,req,res,next)=>{
 	res.status(error.status || 500);
 	res.json({
 		error:{

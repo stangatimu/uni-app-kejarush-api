@@ -3,6 +3,7 @@ const User = require("../models/user"),
     mongoose = require("mongoose"),
     bcrypt = require("bcrypt"),
     crypto = require("crypto"),
+    Joi = require('joi'),
     Token = require("../models/token.js"),
     sgMail = require('@sendgrid/mail'),
     sendSMS = require('../utils/sendSMS'),
@@ -10,18 +11,31 @@ const User = require("../models/user"),
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-exports.users_signup = (req, res, next) => {
-    const ejs = false;
-    User.find({ phone: req.body.phone })
+exports.users_signup = (req, res) => {
+    const data = req.body;
+    const schema = Joi.object().keys({
+        phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
+        name: Joi.string().max(20,'utf8').required(),
+        password: Joi.string().min(7).alphanum().required(),
+        idnumber: Joi.string().max(10,'utf8').required()
+    });
+    const {error,value} = Joi.validate(data,schema);
+    if(error){
+        return res.status(400).json({
+            success: false,
+            message:'inavalid input provided please try again.'
+        });
+    }
+    User.find({ phone: value.phone })
         .exec()
         .then(user => {
             if (user.length >= 1) {
-                return res.status(409).json({
+                return res.status(409).json({ 
                     success: false,
                     message: "That phone number is already registered"
                 });
             } else {
-                bcrypt.hash(req.body.password, 10, (err, hash) => {
+                bcrypt.hash(value.password, 10, (err, hash) => {
                     if (err) {
                         return res.status(500).json({
                             success: false,
@@ -30,9 +44,9 @@ exports.users_signup = (req, res, next) => {
                     } else {
                         const user = new User({
                             _id: new mongoose.Types.ObjectId(),
-                            name: req.body.name,
-                            phone: req.body.phone,
-                            idnumber: req.body.idnumber,
+                            name: value.name,
+                            phone: value.phone,
+                            idnumber: value.idnumber,
                             password: hash
                         });
                         user.save()
@@ -66,76 +80,22 @@ exports.users_signup = (req, res, next) => {
             });
         });
 }
-//account or email confirmation
-exports.phone_confirmation = function (req, res, next) {
-
-    // Find a matching token
-    Token.findOne({ token: req.params.token }, function (err, token) {
-        if (!token) return res.render("resendConfirm", {
-            message: "We were having trouble activating your account. Your link my have expired."
-        });
-
-        // If we found a token, find a matching user
-        User.findOne({ _id: token._userId }, function (err, user) {
-            if (!user) return res.status(500).json({ 
-                success: false,        
-                message: "We were having trouble activating your account." 
-            });
-            if (user.isVerified) return res.status(200).json({ 
-                success: false,
-                message: "Your account is already ativated. Please log in." 
-            });
-
-            // Verify and save the user
-            user.isVerified = true;
-            user.save(function (err) {
-                if (err) { return res.status(500).json({ 
-                    success: false,
-                    message: "We were having trouble activating your account." });
-                }
-                return res.status(201).json({ 
-                    success: false,
-                    message: "Account has been verified you can now log in in the app" 
-                });
-            });
-        });
-    });
-};
-//resend confirmation email
-exports.resend_confirmation = function (req, res, next) {
-    const ejs = true;
-    User.findOne({ email: req.body.email }, function (err, user) {
-        if (!user) return res.status(200).json({ 
-            success: true,
-            message: 'Check ' + req.body.email + ' for verification link.' 
-        });
-        if (user.isVerified) return res.status(201).json({ 
-            success: true, 
-            message: "Account is already activated.Please log in." 
-        });
-
-        // Create a verification token, save it, and send email
-        var token = new Token({ _userId: user._id, token: crypto.randomBytes(16).toString('hex') });
-
-        // Save the token
-        token.save(function (err) {
-            if (err) { if (user.isVerified) return res.status(500).json({
-                success: false, 
-                message: "we are having trouble sending you a link. Please try again latter" 
-            }); 
-        }
-
-            // Send email custom fuction
-            sendMail(req, res, user, token, ejs)
-        });
-
-    });
-};
-
 
 //log in logic
-exports.users_login = (req, res, next) => {
-    User.findOne({ phone: req.body.phone })
+exports.users_login = (req, res) => {
+    const data = req.body;
+    const schema = Joi.object().keys({
+        phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
+        password: Joi.string().min(7).max(30).alphanum().required()
+    });
+    const {error,value} = Joi.validate(data,schema);
+    if(error){
+        return res.status(400).json({
+            success: false,
+            message:'inavalid input provided please try again.'
+        });
+    }
+    User.findOne({ phone: value.phone })
         .exec()
         .then(user => {
             if (!user) {
@@ -145,7 +105,7 @@ exports.users_login = (req, res, next) => {
                 });
             }
             //custom function at the buttom of this document
-            comparePassword(req.body.password, user, res);
+            comparePassword(value.password, user, res);
 
         })
         .catch(e => {
@@ -156,7 +116,7 @@ exports.users_login = (req, res, next) => {
         });
 }
 //display profile
-exports.users_profile = async function (req, res, next) {
+exports.users_profile = async function (req, res) {
     try {
         let user = await User.findById(req.query.id);
         const products = await Product.find({ author: user._id }).count();
@@ -229,8 +189,9 @@ exports.users_delete = function (req, res, next) {
 }
 
 exports.deleteProperty = async function (req, res, next) {
+    
     try {
-        property = await Property.findById(prodId);
+        property = await Property.findById(req.query.Id);
         orders = await Oders.find({ prodId: property._id });
         property.remove();
         orders.forEach(order => {
