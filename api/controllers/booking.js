@@ -67,10 +67,63 @@ exports.booking_callback = (req,res)=>{
 }
 
 exports.get_property_bookings = (req,res)=>{
+    const data = req.query.id;
+
+    const {error, value } = Joi.validate({id: data},{a: Joi.string()});
+    if(error){
+        return res.status(400).json({
+            success: false,
+            message:"invalid parameters, please try again with correct parameters"
+        });
+    }
+
+    try{
+        let bookings = await Booking.find({property: value.id});
+
+        if(bookings.length){
+            return res.status(200).json({
+                success:true,
+                bookings: bookings
+            });
+        }
+        return res.status(404).json({
+            success: false,
+            message:"Sorry, bookings not yet made to this property."
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message: "Something went wrong, please try again latter."
+        });
+
+    }
 
 }
 
 
-exports.get_all_bookings = (res,req)=>{
+exports.get_all_bookings = (req,res)=>{
+
+    try{
+        let bookings = await Booking.find();
+
+        if(bookings.length){
+            return res.status(200).json({
+                success:true,
+                bookings: bookings
+            });
+        }
+        return res.status(404).json({
+            success: false,
+            message:"Sorry, bookings not yet made to this property."
+        });
+
+    }catch(error){
+        return res.status(500).json({
+            success:false,
+            message: "Something went wrong, please try again latter."
+        });
+
+    }
     
 }
