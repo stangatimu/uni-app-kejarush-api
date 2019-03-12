@@ -1,5 +1,4 @@
 const User = require("../models/user"),
-    Product = require("../models/property"),
     mongoose = require("mongoose"),
     bcrypt = require("bcrypt"),
     crypto = require("crypto"),
@@ -119,17 +118,9 @@ exports.users_login = (req, res) => {
 exports.users_profile = async function (req, res) {
     try {
         let user = await User.findById(req.query.id);
-        const products = await Product.find({ author: user._id }).count();
         return res.status(200).json({
             success: true,
-            user: {
-                name: user.name,
-                count: products,
-                email: user.email,
-                id: user._id,
-                dp: user.dp,
-                bio: user.bio
-            }
+            user: user
 
         });
     } catch (e) {
@@ -146,9 +137,6 @@ exports.users_edit = function (req, res, next) {
     User.findById(req.userData.userId, (err, user) => {
         if (err) return next(err);
         if (req.body.name) user.name = req.body.name;
-        if (req.body.email) user.email = req.body.email;
-        if (req.body.dp) user.dp = req.body.dp;
-        if (req.body.bio) user.bio = req.body.bio;
         if (req.body.password) {
             bcrypt.hash(req.body.password, 10, (err, hash) => {
                 if (err) {
@@ -186,21 +174,4 @@ exports.users_delete = function (req, res, next) {
                 error: "User could not be found!"
             });
         });
-}
-
-exports.deleteProperty = async function (req, res, next) {
-    
-    try {
-        property = await Property.findById(req.query.Id);
-        orders = await Oders.find({ prodId: property._id });
-        property.remove();
-        orders.forEach(order => {
-            order.remove();
-        });
-
-    } catch (err) {
-        console.log(err)
-    }
-
-
 }

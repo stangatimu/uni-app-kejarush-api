@@ -66,7 +66,7 @@ exports.booking_callback = (req,res)=>{
 
 }
 
-exports.get_property_bookings = (req,res)=>{
+exports.get_property_bookings = async (req,res)=>{
     const data = req.query.id;
 
     const {error, value } = Joi.validate({id: data},{a: Joi.string()});
@@ -102,7 +102,7 @@ exports.get_property_bookings = (req,res)=>{
 }
 
 
-exports.get_all_bookings = (req,res)=>{
+exports.get_all_bookings = async  (req,res)=>{
 
     try{
         let bookings = await Booking.find();
