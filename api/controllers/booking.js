@@ -71,9 +71,9 @@ exports.booking_callback = (req,res)=>{
 }
 
 exports.get_property_bookings = async (req,res)=>{
-    const data = req.query.id;
+    const data = req.query.property;
 
-    const {error, value } = Joi.validate({id: data},{a: Joi.string()});
+    const {error, value } = Joi.validate({id: data},{id: Joi.string()});
     if(error){
         return res.status(400).json({
             success: false,
@@ -82,7 +82,9 @@ exports.get_property_bookings = async (req,res)=>{
     }
 
     try{
-        let bookings = await Booking.find({property: value.id});
+        let bookings = await Booking.find({property: value.id})
+            .select('client status amount')
+            .populate('property','name')
 
         if(bookings.length){
             return res.status(200).json({
@@ -102,7 +104,6 @@ exports.get_property_bookings = async (req,res)=>{
         });
 
     }
-
 }
 
 
