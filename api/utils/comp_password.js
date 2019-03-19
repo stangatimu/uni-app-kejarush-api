@@ -19,6 +19,7 @@ comparePassword = (password1,user,resp)=>{
 			}
 			const token = jwt.sign({
 				phone:user.phone,
+				name: user.name,
 				userId: user._id
 			  }, process.env.jwtkey,
 			  { expiresIn: "7d"}

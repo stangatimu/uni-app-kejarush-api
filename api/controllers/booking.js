@@ -1,7 +1,8 @@
-const Booking = require("../models/booking"),
+const mongoose = require('mongoose'),
+    Booking = require("../models/booking"),
     ad = require("../models/ad"),
     Joi = require('joi'),
-    initializeStkPush = require("../utils/initializePayment");
+    Axios = require('axios')
 
 
 exports.intialize_booking = async function(req,res){
@@ -9,6 +10,7 @@ exports.intialize_booking = async function(req,res){
     const schema = Joi.object().keys({
         phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
         amount: Joi.number().max(100000).required(),
+        property: Joi.string().max(100).required()
     });
 
     const {error,value} = Joi.validate(data,schema);
@@ -20,16 +22,18 @@ exports.intialize_booking = async function(req,res){
     }
     //initialize stk push
     try {
-        let data = await initializeStkPush(value.phone, value.amount, req.userData.userId);
-        
+        let response = await Axios.post(
+            'http://localhost:5000/stkpush',{phone:value.phone,amount:value.amount}
+        )
         //if success creat a new booking with pending status
         const booking = new Booking({
+            _id: new mongoose.Types.ObjectId(),
             property: value.property,
             client:{
-                name:value.name,
+                name:req.userData.name,
                 phone: value.phone
             },
-            checkoutRequestID:data.checkoutRequestID,
+            CheckoutRequestID:response.data.CheckoutRequestID,
             status:'pending',
             amount: value.amount
         });
@@ -37,13 +41,13 @@ exports.intialize_booking = async function(req,res){
         
         return res.status(201).json({
             success: true,
-            message: data,
+            message: response.data,
             booking: newBooking
 
         });
 
     } catch (err) {
-        console.log(err)
+        
        return res.status(500).json({
             success: false,
             message: err.message

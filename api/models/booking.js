@@ -3,7 +3,7 @@ const mongoose  = require('mongoose');
 
 const bookingSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    property:{type: String,required: [true,'property required']},
+    property:{type: mongoose.Schema.Types.ObjectId, ref:'Property', required: true},
     client:{
         name:{type: String,required:[true,'tenant name required']},
         phone:{type:Number,required:[true,'field cannot be empty']}
