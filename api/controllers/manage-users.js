@@ -58,11 +58,6 @@ exports.agent_revoke_house = async (req,res)=>{
         })
 
     }
-    //look up user
-
-    //edit property field and set rent field 0
-
-    //catch any error
 }
 
 exports.agent_edit_rent = async (req,res)=>{
