@@ -16,9 +16,48 @@ exports.agent_asign_house = (req,res)=>{
     //catch any error
 }
 
-exports.agent_revoke_house = (req,res)=>{
+exports.agent_revoke_house = async (req,res)=>{
     // validate input
+    const data = req.query.user;
 
+    const {error, value } = Joi.validate({id: data},{id: Joi.string()});
+    if(error){
+        return res.status(400).json({
+            success: false,
+            message:"invalid parameters, please try again with correct parameters"
+        });
+    }
+
+    try{
+
+        let user = User.findById(value.id);
+
+        if(user == undefined){
+            throw new Error('Sorry, the tenant could not be found');
+        }
+
+        user.property = '';
+        user.rent = 0;
+        user.save();
+
+        return res.status(202).json({
+            success: true,
+            message:"User has successfully been edited",
+            user:{
+                name: user.name,
+                rent: user.rent,
+                property: user.property
+            },
+        })
+
+    }catch(error){
+
+        return res.status(400).json({
+            success: false,
+            message:"Sorry, tenant could not be edited. Try again later."
+        })
+
+    }
     //look up user
 
     //edit property field and set rent field 0
@@ -89,9 +128,20 @@ exports.get_negative_rent_users = async (req,res)=>{
 
 exports.get_users_by_property = async (req,res)=>{
 
+    const data = req.query.property;
+
+    const {error, value } = Joi.validate({id: data},{id: Joi.string()});
+
+    if(error){
+        return res.status(400).json({
+            success: false,
+            message:"invalid parameters, please try again with correct parameters"
+        });
+    }
+
     try{
 
-        let users = await User.find({property: req.query.property});
+        let users = await User.find({property: value.property});
         
         return res.status(200).json({
             success: true,
@@ -104,7 +154,6 @@ exports.get_users_by_property = async (req,res)=>{
         return res.status(404).json({
             success: true,
             message: 'Sorry, users for that property no',
-            error: error.message
             
         })
     }
