@@ -7,7 +7,9 @@ const express   = require('express'),
 
 router.post('/' ,rateLimit.globalBF.prevent,checkAuth,Controllers.intialize_booking);
 
-router.get('/',rateLimit.globalBF.prevent,Controllers.get_property_bookings);
+router.get('/',rateLimit.globalBF.prevent,checkRole,Controllers.get_property_bookings);
+
+router.get('/all',rateLimit.globalBF.prevent,checkRole,Controllers.get_all_bookings);
 
 
 module.exports = router;
