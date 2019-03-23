@@ -5,7 +5,7 @@ const cartegorySchema = mongoose.Schema({
     image: {type: String, required: true},
     created:{type: Date, default: Date.now},
     properties:{type:Number, default: 0},
-    subcategories:{type:[String],required:[true,'please specify a subcategory']
+    subcategories:{type:[String],default:[]
     }
 });
 

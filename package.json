@@ -34,7 +34,8 @@
     "nodemailer": "^4.6.4",
     "passport": "^0.4.0",
     "passport-google-plus-token": "^2.1.0",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "twilio": "^3.29.2"
   },
   "devDependencies": {
     "nodemon": "^1.18.10",
