@@ -4,16 +4,48 @@ const Joi = require('Joi'),
 
 exports.agent_asign_house = (req,res)=>{
     //validate input
+    let schema = Joi.object().keys({
+        user : Joi.string().max(100).required(),
+        property : Joi.string().max(100).required(),
+        deposit: Joi.number().min(0).max(1).required()
+    });
 
-    //check user and property
+    let {error, value } = Joi.validate(req.body,schema);
 
-    //credit user with deposit and  1st rent
+    if(error){
+        return res.status(400).json({
+            success: true,
+            message: error.message
+        });
+    }
 
-    //asign property to user and save
-    
-    //return success
+    try{
+        let user = User.findById(value.user);
+        let property = Property.findById(value.property);
 
-    //catch any error
+        if( property === undefined || user === undefined){
+
+            throw new Error('Sorry, something went wrong. Try again later.')
+        }
+
+        let deposit = property.rent * (value.deposit +1);
+        user.accBalance = user.accBalance - (deposit);
+        user.rent = property.rent;
+        user.save();
+
+        return res.status(202).json({
+            success: true,
+            message:"User allocated house successfully."
+        });
+
+    }catch(error){
+
+        return res.status(400).json({
+            success: true,
+            message:"User house allocation was not successfully."
+        });
+
+    }
 }
 
 exports.agent_revoke_house = async (req,res)=>{
@@ -63,7 +95,7 @@ exports.agent_revoke_house = async (req,res)=>{
 exports.agent_edit_rent = async (req,res)=>{
 
     let schema = Joi.object().keys({
-        _id : Joi.string().max(100).required(),
+        id : Joi.string().max(100).required(),
         rent: Joi.number().min(0).required()
     });
     let {error, value } = Joi.validate(req.body,schema);
@@ -76,7 +108,7 @@ exports.agent_edit_rent = async (req,res)=>{
     }
 
     try{
-        let user = await User.findById(value._id);
+        let user = await User.findById(value.id);
 
         user.rent = value.rent;
         user.save();

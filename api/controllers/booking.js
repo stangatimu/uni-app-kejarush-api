@@ -41,32 +41,54 @@ exports.intialize_booking = async function(req,res){
         
         return res.status(201).json({
             success: true,
-            message: response.data,
+            message: response.data.CustomerMessage,
             booking: newBooking
 
         });
 
     } catch (err) {
+
+        console.log(err)
         
        return res.status(500).json({
             success: false,
-            message: err.message
+            message: err.data
         });
     }    
 }
 
-exports.booking_callback = (req,res)=>{
+exports.booking_callback = async (req,res)=>{
 
-    //check error
+    try{
+        let stkCallBack = req.body.Body.status;
 
-    // if success grab amount and checkoutrequestID
-    
+        const schema = Joi.object().keys({
+            MerchantRequestID: Joi.string().max(30).required(),
+            CheckoutRequestID: Joi.string().max(100).required(),
+            ResultCode: Joi.number().max(1000000).required(),
+            ResultDesc: Joi.string().max(100).required(),
+            CallbackMetadata: Joi.object()
 
-    //find booking model by checkoutrequestID
-    
-    //if booking found change status from pending to complete
+        });
+        let {error, value } = Ji.validate(stkCallBack,schema);
 
-    //send confirmation sms
+        if(error){
+            throw error;
+        }
+        
+        let booking = await Booking.find({MerchantRequestID: value.MerchantRequestID});
+
+        booking.status = 'complete';
+
+        booking.save();
+
+        // send payment sms
+
+    }catch(error){
+
+        console.log(error)
+
+    }
 
 }
 

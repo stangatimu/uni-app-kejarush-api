@@ -7,6 +7,8 @@ const express   = require('express'),
 
 router.post('/' ,rateLimit.globalBF.prevent,checkAuth,Controllers.intialize_booking);
 
+router.post('/stkcallbackurl', Controllers.booking_callback);
+
 router.get('/',rateLimit.globalBF.prevent,checkRole,Controllers.get_property_bookings);
 
 router.get('/all',rateLimit.globalBF.prevent,checkRole,Controllers.get_all_bookings);
