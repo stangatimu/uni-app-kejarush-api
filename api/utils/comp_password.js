@@ -27,11 +27,6 @@ comparePassword = (password1,user,resp)=>{
 			return resp.status(200).json({
 				success: true,
 				message:"Authentication successful",
-				user:{
-					phobe: user.phone,
-					name: user.name,
-					role: 'user'
-				},
 				token: token,
 				expiresIn: "7d"
 			});

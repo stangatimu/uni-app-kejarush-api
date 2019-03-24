@@ -10,13 +10,12 @@ const User = require("../models/user"),
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-exports.users_signup = (req, res) => {
+exports.users_signup = async (req, res) => {
     const data = req.body;
     const schema = Joi.object().keys({
         phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
         name: Joi.string().max(20,'utf8').required(),
-        password: Joi.string().min(7).alphanum().required(),
-        idnumber: Joi.string().max(10,'utf8').required()
+        password: Joi.string().min(7).alphanum().required()
     });
     const {error,value} = Joi.validate(data,schema);
     if(error){
@@ -25,60 +24,51 @@ exports.users_signup = (req, res) => {
             message:'inavalid input provided please try again.'
         });
     }
-    User.find({ phone: value.phone })
-        .exec()
-        .then(user => {
-            if (user.length >= 1) {
-                return res.status(409).json({ 
-                    success: false,
-                    message: "That phone number is already registered"
-                });
-            } else {
-                bcrypt.hash(value.password, 10, (err, hash) => {
-                    if (err) {
-                        return res.status(500).json({
-                            success: false,
-                            error: "Registration failed, please try again later"
-                        });
-                    } else {
-                        const user = new User({
-                            _id: new mongoose.Types.ObjectId(),
-                            name: value.name,
-                            phone: value.phone,
-                            idnumber: value.idnumber,
-                            password: hash
-                        });
-                        user.save()
-                            .then(result => {
-                                const token = new Token({
-                                    _userId: user._id,
-                                    token: crypto.randomBytes(16).toString('hex'),
-                                });
-                                token.save();
-                                //send mail custom function
-                                // sendMail(req,res, user, token, ejs);
-                                sendSMS(res)
 
-                            })
-                            .catch(err => {
-                                console.log(err);
-                                res.status(500).json({
-                                    success: false,
-                                    error: err.message
-                                });
-                            });
-                    }
-                });
+    try{
 
-            }
-        })
-        .catch(e => {
-            res.status(500).json({
+        let user = await User.find({ phone: value.phone });
+        if (user.length) {
+            return res.status(409).json({ 
                 success: false,
-                error: e.message
+                message: "That phone number is already registered"
             });
-        });
+        } else {
+            bcrypt.hash(value.password, 10, (err, hash) => {
+                if (err) {
+                    return res.status(500).json({
+                        success: false,
+                        error: "Registration failed, please try again later"
+                    });
+                } else {
+                    var randomNumber = Math.floor(1000 + Math.random() * 9000);
+                    const user = new User({
+                        _id: new mongoose.Types.ObjectId(),
+                        name: value.name,
+                        phone: value.phone,
+                        randInt: randomNumber,
+                        password: hash
+                    });
+                    user.save();
+                    sendSMS(randomNumber, use.phone);
+                    return res.json(201).json({
+                        success: true,
+                        message:"registration was successful, check your sms inbox to login"
+                    })
+                }
+            });
+        }
+    }catch(err){
+
+        return res.json(500).json({
+            success: false,
+            message:"registration was not successful, try again latter."
+        });        
+    }
+
 }
+
+         
 
 //log in logic
 exports.users_login = (req, res) => {

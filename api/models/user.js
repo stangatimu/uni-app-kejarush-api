@@ -4,7 +4,7 @@ const userSchema = mongoose.Schema({
 	_id: mongoose.Schema.Types.ObjectId,
 	name:{type:String, required: true},
 	phone:{type: Number, required: true, unique: true},
-	idnumber:{type: Number, required: true, unique: true},
+	idnumber:{type: Number, unique: true},
 	password:{type: String, required: true},
 	property:{type: String, default:''},
 	rent:{type:Number,default:0},
