@@ -107,7 +107,8 @@ exports.users_login = (req, res) => {
 //display profile
 exports.users_profile = async function (req, res) {
     try {
-        let user = await User.findById(req.query.id);
+        let user = await User.findById(req.query.id)
+            .select('property rent accBalance _id name phone idnumber')
         return res.status(200).json({
             success: true,
             user: user

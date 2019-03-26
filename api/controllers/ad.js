@@ -4,6 +4,9 @@ const Property = require('../models/property'),
     Category = require('../models/categories');
 
 
+// get all ads
+// mreal.herokuapp.com/property
+
 exports.ad_create = async function (req, res) {
     const geoLoc = {
         type: "Point",
