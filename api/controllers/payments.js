@@ -3,8 +3,7 @@ const Payment = require('../models/payment')
     Joi = require('joi')
 
 
-exports.init_Payment = (req, res)=>{
-    exports.intialize_booking = async function(req,res){
+exports.init_Payment = async (req, res)=>{
         const data = req.body;
         const schema = Joi.object().keys({
             phone: Joi.number().regex(/^(2547)([0-9]{8})$/).required(),
@@ -51,7 +50,6 @@ exports.init_Payment = (req, res)=>{
                 message: err.data
             });
         }    
-    }
 }
 
 exports.payment_callback = async (req,res)=>{
