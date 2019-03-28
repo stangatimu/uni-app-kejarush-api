@@ -12,6 +12,7 @@ const	user_routes = require('./api/routes/user'),
 		ad_routes = require('./api/routes/ad'),
 		bookng_routes = require('./api/routes/booking'),
 		rent_routes = require('./api/routes/payments');
+		agency_routes = require('./api/routes/manage-user');
 
 
 app.set('trust proxy',+1);
@@ -47,6 +48,7 @@ app.use('/property',property_routes);
 app.use('/ad',ad_routes);
 app.use('/bookings',bookng_routes);
 app.use('/rent',rent_routes);
+app.use('/agnecy',agency_routes);
 
 app.get('/',(req,res,next)=>{
 	res.send('kejarush up and running');

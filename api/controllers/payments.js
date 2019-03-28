@@ -1,4 +1,5 @@
-const Payment = require('../models/payment')
+const Payment = require('../models/payment'),
+    axios = require('axios'),
     mongoose = require('mongoose'),
     Joi = require('joi')
 
@@ -6,8 +7,8 @@ const Payment = require('../models/payment')
 exports.init_Payment = async (req, res)=>{
         const data = req.body;
         const schema = Joi.object().keys({
-            phone: Joi.number().regex(/^(2547)([0-9]{8})$/).required(),
-            amount: Joi.number().max(100000).required(),
+            phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
+            amount: Joi.number().max(70000).required(),
         });
     
         const {error,value} = Joi.validate(data,schema);
@@ -19,7 +20,7 @@ exports.init_Payment = async (req, res)=>{
         }
         //initialize stk push
         try {
-            let response = await Axios.post(
+            let response = await axios.post(
                 'http://localhost:5000/stkpush',{phone:value.phone,amount:value.amount}
             )
             //if success creat a new booking with pending status
@@ -32,6 +33,7 @@ exports.init_Payment = async (req, res)=>{
                 tenant:req.userData.userID,
                 amount: value.amount
             });
+            
             const newPayment = await Payment.create(booking);
             
             return res.status(201).json({

@@ -1,4 +1,4 @@
-const Joi = require('Joi'), 
+const Joi = require('joi'), 
     User = require('../models/user'),
     Property = require('../models/property');
 
