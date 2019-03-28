@@ -1,21 +1,36 @@
 const   mongoose = require('mongoose'),
+        Joi = require('joi'),
         Property = require('../models/property'),
         User = require('../models/user');
 
 
 
 exports.property_create = async (req,res)=>{
+    const schema = Joi.object().keys({
+        name: Joi.string().min(4).max(40).required(),
+        photos: Joi.string().min(3).max(2000).required(),
+        lat: Joi.number().min(-86).max(86).required(),
+        lon: Joi.number().min(-180).max(180).required(),
+        rent: Joi.number.min(0).required()
+    })
+    
+    const {error, value} = Joi.validate(req.body,schema);
+
+    if(error){
+        throw new Error('Invalid property fields. please try again.');
+    }
+
     const geoLoc = {
 		type: "Point",
-		coordinates: [req.body.lon,req.body.lat]
+		coordinates: [value.lon,value.lat]
     }
     try{
         const property = new Property({
             _id: new  mongoose.Types.ObjectId(),
-            name: req.body.name,
-            photos: req.body.photos.split(","),
+            name: value.name,
+            photos: value.photos.split(","),
             location: geoLoc,
-            rent:req.body.rent,
+            rent:value.rent,
             author: req.userData.name
         });
 
