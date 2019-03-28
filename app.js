@@ -48,7 +48,7 @@ app.use('/property',property_routes);
 app.use('/ad',ad_routes);
 app.use('/bookings',bookng_routes);
 app.use('/rent',rent_routes);
-app.use('/agnecy',agency_routes);
+app.use('/agency',agency_routes);
 
 app.get('/',(req,res,next)=>{
 	res.send('kejarush up and running');
