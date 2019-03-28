@@ -9,9 +9,9 @@ exports.property_create = async (req,res)=>{
     const schema = Joi.object().keys({
         name: Joi.string().min(4).max(40).required(),
         photos: Joi.string().min(3).max(2000).required(),
-        lat: Joi.number().min(-86).max(86).required(),
+        lat: Joi.number().min(-85.05112878).max(85.05112878).required(),
         lon: Joi.number().min(-180).max(180).required(),
-        rent: Joi.number.min(0).required()
+        rent: Joi.number().positive().required()
     })
     
     const {error, value} = Joi.validate(req.body,schema);
@@ -27,11 +27,11 @@ exports.property_create = async (req,res)=>{
     try{
         const property = new Property({
             _id: new  mongoose.Types.ObjectId(),
-            name: value.name,
+            name: value.name.trim(),
             photos: value.photos.split(","),
             location: geoLoc,
             rent:value.rent,
-            author: req.userData.name
+            author: req.userData.name.trim()
         });
 
         const newProperty = await Property.create(property);
