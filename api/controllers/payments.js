@@ -34,7 +34,7 @@ exports.init_Payment = async (req, res)=>{
                 amount: value.amount
             });
             
-            const newPayment = await Payment.create(booking);
+            const newPayment = await Payment.create(payment);
             
             return res.status(201).json({
                 success: true,
@@ -75,9 +75,9 @@ exports.payment_callback = async (req,res)=>{
         
         let payment = await Payment.find({MerchantRequestID: value.MerchantRequestID});
 
-        booking.status = 'complete';
+        payment.status = 'complete';
 
-        booking.save();
+        payment.save();
 
         // send payment sms
 
