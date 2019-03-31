@@ -245,7 +245,7 @@ exports.get_single_ad = async (req,res) =>{
 		}
 
 		return res.status(200).json({
-			success:false,
+			success:true,
 			enrty: ad
 		})
 
