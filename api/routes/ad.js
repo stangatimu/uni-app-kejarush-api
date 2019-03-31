@@ -18,6 +18,6 @@ router.get('/subcategory/:name', rateLimit.globalBF.prevent,Controllers.get_by_s
 
 router.get('/location', rateLimit.globalBF.prevent,Controllers.get_by_location);
 
-
+router.get('/single',rateLimit.globalBF.prevent,Controllers.get_single_ad)
 
 module.exports = router;

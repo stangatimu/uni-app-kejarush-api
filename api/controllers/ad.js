@@ -234,3 +234,27 @@ exports.get_by_location = (req, res)=>{
     });
     
 }
+
+exports.get_single_ad = async (req,res) =>{
+	try{
+
+		let ad = await Ad.findById(req.query.ad);
+
+		if(!ad){
+			throw new Error('Sorry, Property not found!')
+		}
+
+		return res.status(200).json({
+			success:false,
+			enrty: ad
+		})
+
+	}catch(error){
+
+		return res.status(404).json({
+			success: false,
+			message: error.message
+		})
+
+	}
+}
