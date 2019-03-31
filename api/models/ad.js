@@ -11,7 +11,7 @@ const adSchema = new mongoose.Schema({
        name: {type: String, require:[true,'field cannot be empty']},
        _id:{type: String, require:[true,'field cannot be empty']}
     },
-    subcategory:{type:String,required:[true,'field cannot be empty']},
+    subcategory:{type:String,default:''},
     upFor:{type: String,enum:['sale','rent'], required:[true,'for field cannot be empty']},
     photos:{type:[String],default:['']},
     description:{type: String, require:[true,'field cannot be empty']},

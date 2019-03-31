@@ -1,5 +1,6 @@
 const Property = require('../models/property'),
-    mongoose = require('mongoose'),
+	mongoose = require('mongoose'),
+	Joi = require('joi'),
     Ad = require('../models/ad'),
     Category = require('../models/categories');
 
@@ -8,28 +9,49 @@ const Property = require('../models/property'),
 // mreal.herokuapp.com/property
 
 exports.ad_create = async function (req, res) {
-    const geoLoc = {
-        type: "Point",
-        coordinates: [req.body.lon, req.body.lat]
-    }
+	
     try {
-        const category = await Category.findById(req.body.category);
-        const property = await Property.findById(req.body.property);
+		const schema = Joi.object().keys({
+			name: Joi.string().min(4).max(40).required(),
+			type: Joi.string().min(4).max(4).required(),
+			photos: Joi.string().min(3).max(2000).required(),
+			category: Joi.string().min(10).max(50).required(),
+			subcategory:Joi.string().allow('').max(40).optional(),
+			property: Joi.string().min(4).max(40).required(),
+			desc:Joi.string().min(100).required(),
+			lat: Joi.number().min(-85.05112878).max(85.05112878).required(),
+			lon: Joi.number().min(-180).max(180).required(),
+			rent: Joi.number().positive().required()
+		})
+		
+		const {error, value} = Joi.validate(req.body,schema);
+	
+		if(error){
+			throw new Error(error.message);
+		}
+		
+		const geoLoc = {
+			type: "Point",
+			coordinates: [value.lon, value.lat]
+		}
+
+        const category = await Category.findById(value.category);
+        const property = await Property.findById(value.property);
         const ad = new Ad({
             _id: new mongoose.Types.ObjectId,
-            name: req.body.name,
+            name: value.name,
             property: property._id,
             author: req.userData.agentID,
-            rent: req.body.rent,
-            description: req.body.desc,
+            rent: value.rent,
+            description: value.desc,
             category: {
                 name: category.name,
                 _id: category._id
             },
-            subcategory:req.body.subcategory,
+            subcategory:value.subcategory,
             location: geoLoc,
-            upFor: req.body.type,
-            photos: req.body.photos.split(',')
+            upFor: value.type,
+            photos: value.photos.split(',')
         });
         const newAd = await Ad.create(ad);
         category.property++;
