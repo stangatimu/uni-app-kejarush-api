@@ -94,7 +94,7 @@ exports.ad_delete = async function (req, res) {
 	}	
 }
 
-exports.ad_get_all = function (req, res) {
+exports.ad_get_all = async function (req, res) {
 	var perPage = parseInt(req.query.per) || 10;
 	var page = req.query.page;
 	var high = 100000000;
@@ -102,31 +102,37 @@ exports.ad_get_all = function (req, res) {
 	if(req.query.high) high = req.query.high;
 	if(req.query.low) low = req.query.low;
 
-	 Ad.find({rent: {$lte: high, $gte: low}})
-	 .sort({created: -1, rating: -1})
-	 .skip(perPage * page)
-	 .limit(perPage)
- 	.exec()
- 	.then(ads =>{
- 		if (ads.length>0) {
- 			res.status(200).json({
-				 success: true,
-                 entries: ads
-                });
- 		} else {
- 			res.status(404).json({
-				success: false, 
-				message:'No entries found'});
- 		}
- 	})
- 	.catch(err=>{
- 		res.status(500).json({
+	try{
+		let ads = await Ad.find({rent: {$lte: high, $gte: low}})
+		.sort({created: -1, rating: -1})
+		.skip(perPage * page)
+		.limit(perPage);
+		let count = await Ad.find({rent: {$lte: high, $gte: low}}).count();
+
+		if(!ads.length){
+			return res.status(404).json({
+						success: false, 
+						message:'Sorry, no properties yet. Please try again later'
+					});
+		}
+
+		return res.status(200).json({
+					success: true,
+					count: count,
+					entries: ads
+		   		});
+
+	}catch(error){
+
+		return res.status(400).json({
 			success: false, 
-			message:"sorry! found errors on request"});
- 	});
+			message:'Sorry, something went wrong.Please try again later.'
+		});
+
+	}
 }
 
-exports.get_by_category = function (req,res){
+exports.get_by_category = async function (req,res){
     const perPage = parseInt(req.query.per) || 10;
 	var page = req.query.page;
 	var high = 100000000;
@@ -134,28 +140,34 @@ exports.get_by_category = function (req,res){
 	if(req.query.high) high = req.query.high;
 	if(req.query.low) low = req.query.low;
 
-	Ad.find({"category._id":req.params.id,rent: {$lte: high, $gte: low}})
-	.sort({created: -1})
-	.skip(perPage * page)
-	.limit(perPage)
-	.exec()
-	.then(ad =>{
-		if (ad.length) {
-			res.status(200).json({
-				success: true,
-				entries: ad});
-		} else {
-			res.status(404).json({
-				success: false,
-				message:'No entries yet'});
+	try{
+		let ads = await Ad.find({"category._id":req.params.id,rent: {$lte: high, $gte: low}})
+		.sort({created: -1, rating: -1})
+		.skip(perPage * page)
+		.limit(perPage);
+		let count = await Ad.find({"category._id":req.params.id,rent: {$lte: high, $gte: low}}).count();
+
+		if(!ads.length){
+			return res.status(404).json({
+						success: false, 
+						message:'Sorry, no properties yet for this category. Please try again later'
+					});
 		}
-	})
-	.catch(err=>{
-		res.status(500).json({
-			success: false,
-            message:err.message
-        });
-	});
+
+		return res.status(200).json({
+					success: true,
+					count: count,
+					entries: ads
+		   		});
+
+	}catch(error){
+
+		return res.status(400).json({
+			success: false, 
+			message:'Sorry, something went wrong.Please try again later.'
+		});
+
+	}
 }
 
 exports.get_by_subcategory = function (req, res){
@@ -191,7 +203,7 @@ exports.get_by_subcategory = function (req, res){
     
 }
 
-exports.get_by_location = (req, res)=>{
+exports.get_by_location = async (req, res)=>{
     
     const perPage = parseInt(req.query.per) || 10;
 	var page = req.query.page;
@@ -199,40 +211,58 @@ exports.get_by_location = (req, res)=>{
 	var low = 0;
 	if(req.query.high) high = req.query.high;
 	if(req.query.low) low = req.query.low;
-	Ad.find({
-		location: {
-		 $near: {
-		  $maxDistance: req.query.range ,
-		  $geometry: {
-		   type: "Point",
-		   coordinates: [req.query.lon, req.query.lat]
-		  }
-		 }
+
+	try{
+		let ads = await Ad.find({
+			location: {
+			 $near: {
+			  $maxDistance: req.query.range ,
+			  $geometry: {
+			   type: "Point",
+			   coordinates: [req.query.lon, req.query.lat]
+			  }
+			 }
+			}
+			,offerPrice: {$lte: high, $gte: low}
+		   })
+		.sort({created: -1, rating: -1})
+		.skip(perPage * page)
+		.limit(perPage);
+
+		let count = await Ad.find({
+			location: {
+			 $near: {
+			  $maxDistance: req.query.range ,
+			  $geometry: {
+			   type: "Point",
+			   coordinates: [req.query.lon, req.query.lat]
+			  }
+			 }
+			}
+			,offerPrice: {$lte: high, $gte: low}
+		   }).count();
+
+		if(!ads.length){
+			return res.status(404).json({
+						success: false, 
+						message:'Sorry, no properties yet for this category. Please try again later'
+					});
 		}
-		,offerPrice: {$lte: high, $gte: low}
-	   })
-	   .sort({created: -1})
-	.skip(perPage * page)
-	.limit(perPage)
-	.exec()
-	.then(ads =>{
-		if (ads.length) {
-			res.status(200).json({
-				success: true,
-				entries: ads});
-		} else {
-			res.status(404).json({
-				success: false,
-                message:'No entries yet'
-            });
-		}
-	})
-	.catch(err=>{
-		res.status(500).json({
-			success: false,
-			message:err});
-    });
-    
+
+		return res.status(200).json({
+					success: true,
+					count: count,
+					entries: ads
+		   		});
+
+	}catch(error){
+
+		return res.status(400).json({
+			success: false, 
+			message:'Sorry, something went wrong.Please try again later.'
+		});
+
+	}
 }
 
 exports.get_single_ad = async (req,res) =>{
