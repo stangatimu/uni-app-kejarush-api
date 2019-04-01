@@ -88,3 +88,26 @@ exports.payment_callback = async (req,res)=>{
     }
 
 }
+
+exports.get_user_payments = async (req,res)=>{
+
+    let page  = req.query.page
+
+    try{
+        let payments = await Payment.find({tenant:req.userData.userID})
+            .select('phone amount status createdAt')
+            .skip(10 * page)
+            .limit(page)
+
+        return res.status(200).json({
+            success: true,
+            payments: payments
+        })
+
+    }catch(error){
+         return res.status(500).json({
+             success: false,
+             message:'Sorry, something went wrong. Please try again later'
+         })
+    }
+}
