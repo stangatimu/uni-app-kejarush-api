@@ -23,7 +23,7 @@ exports.init_Payment = async (req, res)=>{
         //initialize stk push
         try {
             let user = await User.findById(req.userData.userId)
-            
+
             if(user.property == ''){
                 throw new Error('You currently dont have any house allocated to you.')
             }
@@ -103,7 +103,7 @@ exports.get_user_payments = async (req,res)=>{
     let page  = req.query.page
 
     try{
-        let payments = await Payment.find({tenant:req.userData.userID})
+        let payments = await Payment.find({tenant:req.userData.userId})
             .select('phone amount status createdAt')
             .skip(10 * page)
             .limit(page)
