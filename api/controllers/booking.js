@@ -52,7 +52,7 @@ exports.intialize_booking = async function(req,res){
         
        return res.status(500).json({
             success: false,
-            message: err.data
+            message: err.message
         });
     }    
 }

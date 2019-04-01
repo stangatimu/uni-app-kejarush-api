@@ -1,4 +1,5 @@
 const Payment = require('../models/payment'),
+    User = require('../models/user'),
     axios = require('axios'),
     mongoose = require('mongoose'),
     Joi = require('joi')
@@ -6,6 +7,7 @@ const Payment = require('../models/payment'),
 
 exports.init_Payment = async (req, res)=>{
         const data = req.body;
+        console.log(req.userData)
         const schema = Joi.object().keys({
             phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
             amount: Joi.number().max(70000).required(),
@@ -20,17 +22,24 @@ exports.init_Payment = async (req, res)=>{
         }
         //initialize stk push
         try {
+            let user = await User.findById(req.userData.userId)
+            
+            if(user.property == ''){
+                throw new Error('You currently dont have any house allocated to you.')
+            }
             let response = await axios.post(
                 'http://localhost:5000/stkpush',{phone:value.phone,amount:value.amount}
             )
+
+            
             //if success creat a new booking with pending status
             const payment = new Payment({
                 _id: new mongoose.Types.ObjectId(),
-                property: value.property,
+                property: user.property,
                 phone: value.phone,
                 CheckoutRequestID:response.data.CheckoutRequestID,
                 status:'pending',
-                tenant:req.userData.userID,
+                tenant:req.userData.userId,
                 amount: value.amount
             });
             
