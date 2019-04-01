@@ -136,7 +136,7 @@ exports.property_delete = async (req, res)=>{
 exports.property_get_all = async (req, res)=>{
 
     try{
-        const page = parseInt(req.params.page) || 0;
+        const page = parseInt(req.query.page) || 0;
 
         const properties = await Property.find()
         .skip(10 * page)
