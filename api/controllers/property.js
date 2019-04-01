@@ -139,8 +139,8 @@ exports.property_get_all = async (req, res)=>{
         const page = parseInt(req.params.page) || 0;
 
         const properties = await Property.find()
-        .skip(20 * page)
-        .limit(page);
+        .skip(10 * page)
+        .limit(10);
 
         if(!properties.length){
             return res.status(404).json({
