@@ -31,7 +31,7 @@ adSchema.index({location:"2dsphere"});
 adSchema.plugin(mongooseAgolia,{
         appId: process.env.appId,
         apiKey: process.env.algoliaAPIkey,
-        indexName: process.env.algoliaIndexName,
+        indexName: "kejarush_ads",
         popuplate:{
                 path:"category",
                 select:'name'

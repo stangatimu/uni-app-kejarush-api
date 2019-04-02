@@ -1,6 +1,6 @@
 const algoliasearch = require('algoliasearch'),
-      client = algoliasearch(process.env.appId,process.env.apiKey),
-      index = client.initIndex(process.env.indexName);
+      client = algoliasearch(process.env.appId,process.env.algoliaAPIkey),
+      index = client.initIndex("kejarush_ads");
 
 exports.products_search = function(req, res){
     if(req.query.query == ''){
@@ -10,7 +10,7 @@ exports.products_search = function(req, res){
         });
     }
     index.setSettings({
-        attributesToHighlight:['name','description']
+        attributesToHighlight:['name']
     })
     index.search({
         query: req.query.query,
@@ -18,7 +18,16 @@ exports.products_search = function(req, res){
         hitsPerPage: parseInt(req.query.per) || 10,
     },
     (err,content)=>{
-        res.status(200).json({
+        if(err || content.nbHits == 0){
+
+            return res.status(404).json({
+                success: false,
+                message:`Sorry no results were found for ${content.query}. Try another keyword`
+            })
+
+
+        }
+        return res.status(200).json({
             success: true,
             content: content,
             search_result: req.query.query            
