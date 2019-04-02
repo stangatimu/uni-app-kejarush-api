@@ -1,4 +1,5 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
+const mongooseAgolia = require('mongoose-algolia')
 
 const adSchema = new mongoose.Schema({
     _id: mongoose.Schema.Types.ObjectId,
@@ -23,8 +24,24 @@ const adSchema = new mongoose.Schema({
 },{
 	toObject: {virtuals: true},
 	toJSON: {virtuals: true}
-});
+})
 
 adSchema.index({location:"2dsphere"});
 
-module.exports = mongoose.model('Ad', adSchema);
+adSchema.plugin(mongooseAgolia,{
+        appId: process.env.appId,
+        apiKey: process.env.algoliaAPIkey,
+        indexName: process.env.algoliaIndexName,
+        popuplate:{
+                path:"category",
+                select:'name'
+        }
+})
+
+let Model = mongoose.model('Ad', adSchema);
+Model.SyncToAlgolia();
+Model.SetAlgoliaSettings({
+        searchableAttributes:['name','description','category','subcategory']
+})
+
+module.exports = Model
