@@ -9,6 +9,7 @@ exports.intialize_booking = async function(req,res){
     const data = req.body;
     const schema = Joi.object().keys({
         phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
+        name: Joi.string().min(5).max(30).required(),
         property: Joi.string().max(100).required()
     });
 
@@ -16,7 +17,7 @@ exports.intialize_booking = async function(req,res){
     if(error){
         return res.status(400).json({
             success: false,
-            message: 'Invalid input, check your inputs and try again.'
+            message: 'Sorry, please check your phone number and try again.'
         });
     }
     //initialize stk push
@@ -29,7 +30,7 @@ exports.intialize_booking = async function(req,res){
             _id: new mongoose.Types.ObjectId(),
             property: value.property,
             client:{
-                name:req.userData.name,
+                name:value.name,
                 phone: value.phone
             },
             CheckoutRequestID:response.data.CheckoutRequestID,
@@ -40,7 +41,7 @@ exports.intialize_booking = async function(req,res){
         
         return res.status(201).json({
             success: true,
-            message: response.data.CustomerMessage,
+            message: `${response.data.CustomerMessage}. You should seed an m-pesa pop-up screen on your phone.`,
             booking: newBooking
 
         });

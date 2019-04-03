@@ -5,7 +5,7 @@ const express   = require('express'),
       router   = express.Router(),
       rateLimit = require('../utils/rate_limit');
 
-router.post('/' ,rateLimit.globalBF.prevent,checkAuth,Controllers.intialize_booking);
+router.post('/' ,rateLimit.globalBF.prevent,Controllers.intialize_booking);
 
 router.post('/stkcallbackurl', Controllers.booking_callback);
 
