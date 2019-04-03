@@ -9,7 +9,6 @@ exports.intialize_booking = async function(req,res){
     const data = req.body;
     const schema = Joi.object().keys({
         phone: Joi.string().regex(/^(2547)([0-9]{8})$/).required(),
-        amount: Joi.number().max(100000).required(),
         property: Joi.string().max(100).required()
     });
 
@@ -23,7 +22,7 @@ exports.intialize_booking = async function(req,res){
     //initialize stk push
     try {
         let response = await Axios.post(
-            'http://localhost:5000/stkpush',{phone:value.phone,amount:value.amount}
+            'http://localhost:5000/stkpush',{phone:value.phone,amount:500}
         )
         //if success creat a new booking with pending status
         const booking = new Booking({
