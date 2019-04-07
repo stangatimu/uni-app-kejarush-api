@@ -132,7 +132,7 @@ exports.get_property_bookings = async (req,res)=>{
 exports.get_all_bookings = async  (req,res)=>{
 
     try{
-        let bookings = await Booking.find();
+        let bookings = await Booking.find().populate('property','name')
 
         if(bookings.length){
             return res.status(200).json({
